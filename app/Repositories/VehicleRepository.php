@@ -23,12 +23,13 @@ class VehicleRepository
      */
     public function getAll($doQuery = null, $paginate = null, array $data = null)
     {
+        
         $query = $this->model;
         
         if ($doQuery) {
             return $query;
         }
-
+        
         if ($paginate) {
             return $query->paginate($paginate);
         }
@@ -137,18 +138,19 @@ class VehicleRepository
     {
         DB::beginTransaction();
 
-        $response = $this->model->firstOrCreate([
+        $response = $this->model->with('photos')->firstOrCreate([
             'user_id' => auth()->user()->id,
             'status' => 0
-        ], [$request->all()]);
+        ]);
 
         if (!$response) {
             DB::rollBack();
             return false;
         }
 
-        DB::commit();
 
+        DB::commit();
+        $response = $this->findByUUID($response->uuid);
         return $response;
     }
 }

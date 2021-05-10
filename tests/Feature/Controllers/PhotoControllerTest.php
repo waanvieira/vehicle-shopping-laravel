@@ -9,6 +9,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class PhotoControllerTest extends TestCase
 {
@@ -35,31 +37,19 @@ class PhotoControllerTest extends TestCase
         $user = User::first();
         auth()->login($user);        
         $request = request();        
-        // $request['zipcode'] = 01310010;
-        // $request['city'] = '' ;
-        // $request['city_url'] = '' ;
-        // $request['uf'] = '' ;
-        // $request['uf_url'] = '' ;
-        // $request['type'] = 200;
-        // $request['brand'] = 1;
-        // $request['model'] = 12;
-        // $request['version'] = 10;
-        // $request['regdate'] = 2010;
-        // $request['gearbox'] = 12;
-        // $request['fuel'] = 100;
-        // $request['steering'] = 1500;
-        // $request['motor_power'] = 20;
-        // $request['doors'] = 1;
-        // $request['color'] = 2;
-        // $request['cubic_cms'] = 4;
-        // $request['owner'] = 12;
-        // $request['mileage'] = 10000;
-        // $request['price'] = 50000;
-        // $request['title'] = 'Meu carro novo';
-        // $request['description'] = 'Description of vechicle';
+        Storage::fake('vehicles');
+
+        $response = $this->json('POST', '/vehicles/photo', [
+            'img' => UploadedFile::fake()->image('avatar.jpg')
+        ]);
         
-        $response = $this->service()->store($request);
-        dd($response);
+        // Assert the file was stored...
+        Storage::disk('vehicles')->assertExists('avatar.jpg');
+
+        // Assert a file does not exist...
+        Storage::disk('vehicles')->assertMissing('missing.jpg');
+        
+        $response = $this->service()->store($request);        
         $this->assertEquals($response->title, 'Meu carro novo');
     }
 

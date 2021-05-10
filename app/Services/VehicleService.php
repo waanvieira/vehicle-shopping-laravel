@@ -43,6 +43,17 @@ class VehicleService
     }
 
     /**
+     * Store or create newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\  $request
+     * @return mix
+     */
+    public function firstOrCreate($request)
+    {        
+        return $this->repository->firstOrCreate($request);
+    }    
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id

@@ -1,13 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vehicles;
 use Illuminate\Http\Request;
 
-class VehicleController extends Controller
+class UserController extends Controller
 {
+
+    public function AuthRouteAPI(Request $request)
+    {
+        return $request->user();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -42,10 +47,10 @@ class VehicleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Vehicles  $vehicles
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Vehicles $vehicles)
+    public function show($id)
     {
         //
     }
@@ -53,10 +58,10 @@ class VehicleController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Vehicles  $vehicles
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Vehicles $vehicles)
+    public function edit($id)
     {
         //
     }
@@ -65,10 +70,10 @@ class VehicleController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Vehicles  $vehicles
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Vehicles $vehicles)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -76,10 +81,10 @@ class VehicleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Vehicles  $vehicles
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Vehicles $vehicles)
+    public function destroy($id)
     {
         //
     }

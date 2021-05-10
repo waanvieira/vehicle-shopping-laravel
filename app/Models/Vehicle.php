@@ -41,17 +41,17 @@ class Vehicle extends Model
             'uf',
             'uf_url',
             'type',
-            'brand',
-            'model',
-            'version',
-            'regdate',
-            'gearbox',
-            'fuel',
-            'steering',
-            'motor_power',
-            'doors',
-            'color',
-            'cubic_cms',
+            'brand_id',
+            'model_id',
+            'version_id',
+            'regdate_id',
+            'gearbox_id',
+            'fuel_id',
+            'steering_id',
+            'motor_power_id',
+            'doors_id',
+            'color_id',
+            'cubic_cms_id',
             'owner',
             'mileage',
             'features',
@@ -68,12 +68,12 @@ class Vehicle extends Model
         'city'    => 'required',
         'uf'      => 'required',
         'type'    => 'required',
-        'brand'   => 'required',
-        'model'   => 'required',
-        'version' => 'required',
-        'regdate' => 'required',
-        'fuel'    => 'required',
-        'price'   => 'required'
+        'brand_id'   => 'required',
+        'model_id'   => 'required',
+        'version_id' => 'required',
+        'regdate_id' => 'required',
+        'fuel_id'    => 'required',        
+        'price'   => 'required',        
     ];
 
     /**
@@ -105,36 +105,36 @@ class Vehicle extends Model
 
     public function brand()
     {
-        return $this->hasOne(Brand::class, 'id');
+        return $this->hasOne(Brand::class, 'value', 'brand_id');
     }
     
     public function model()
     {
-        return VehicleModel::where('model', $this->model)
-                                ->where('brand', $this->brand)
-                                ->first();
+        return VehicleModel::where('value', $this->model_id)
+                            ->where('brand_id', $this->brand_id)
+                            ->first();                                
     }
 
     public function version()
     {
-        return VehicleModel::where('value', $this->version)
-                                ->where('brand_id', $this->brand)
-                                ->where('model_id', $this->model->value)
+        return VehicleVersion::where('value', $this->version_id)
+                                ->where('brand_id', $this->brand_id)
+                                ->where('model_id', $this->model_id)
                                 ->first();
     }
 
     public function color()
     {
-        return $this->hasOne(Color::class, 'id', 'color');
+        return $this->hasOne(Color::class, 'value', 'color_id');
     }
 
     public function fuel()
     {
-        return $this->hasOne(Fuel::class, 'id', 'fuel');
+        return $this->hasOne(Fuel::class, 'value', 'fuel_id');
     }
 
     public function gearBox()
     {
-        return $this->hasOne(GearBox::class, 'id', 'bearbox');
+        return $this->hasOne(GearBox::class, 'value', 'bearbox_id');
     }
 }

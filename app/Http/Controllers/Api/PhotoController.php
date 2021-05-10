@@ -87,7 +87,7 @@ class PhotoController extends Controller
      */
     public function show(Request $request, $uuid)
     {        
-        $response = $this->service->findByUUID($uuid);
+        $response = $this->service->findByUUID($uuid);        
         $photo = $this->get($response->img, $request->width, $request->height);
         return $photo;
     }

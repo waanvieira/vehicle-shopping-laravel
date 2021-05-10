@@ -1634,7 +1634,7 @@ class AddModels extends Command
         
         foreach( $datas as $data) {
             
-            if (!DB::table('vehicle_models')->where('name', $data[0])->first()) {                
+            if (!DB::table('vehicle_models')->where('name', $data[1])->first()) {                
                 DB::table('vehicle_models')->insert([
                     'brand_id'   => $data[0],
                     'type_id'    => $data[3],

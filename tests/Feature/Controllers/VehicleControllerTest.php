@@ -31,11 +31,18 @@ class VehicleControllerTest extends TestCase
      */
     public function testVehicleControllerIndex()
     {
-        $user = User::first();
-        auth()->login($user);        
-        $request = request();        
-        $response = $this->service()->index();                
-        $this->assertNotNull($response);
+        $user = User::latest()->first();
+        auth()->login($user);
+        // $response = $this->json('GET', '/api/vehicles');
+        $response = $this->service()->index();
+        dd($response);
+        // $response->assertStatus(200);
+            // ->assertJsonFragment([
+            //     'name' => 'Anakin Skywalker',
+            // ]);
+
+        // 
+        // $this->assertNotNull($response);
     }
     
     /**
@@ -47,10 +54,10 @@ class VehicleControllerTest extends TestCase
     public function testVehicleControllerStore()
     {
         $user = User::first();
-        auth()->login($user);        
+        auth()->login($user);
         $request = request();        
         $response = $this->service()->store($request);        
-        $this->assertEquals($response->user_id, $user->id);
+        $this->assertNotNull($response);
     }
 
      /**
@@ -107,5 +114,18 @@ class VehicleControllerTest extends TestCase
         $this->assertNotNull($response);
     }
 
+    /**
+     * Teste show method
+     *
+     * @group vehicle
+     * @return void
+     */
+    public function testVehicleControllerShow()
+    {        
+        $uuid = Vehicle::latest()->first()->uuid;        
+        $response = $this->service()->show($uuid);        
+        dd($response);
+        $this->assertTrue($response);
+    }
 
 }

@@ -46,45 +46,40 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        try {
-                  
-            $vehicles = $this->service->getAll(true, env(env('APP_PAGINATE')), null)
-                                        ->with('cover', 
-                                                // 'brand', 
-                                                // 'model'
-                                                //'version'
-                                                 'color',
-                                                'fuel',
-                                                'gearBox'
-                                                )
-                                        // ->where('user_id', auth()->user()->id)
-                                        ->where('status', 1)
-                                        ->paginate(env(env('APP_PAGINATE')));
+        try {           
             
+            $vehicles = $this->service->getAll(true, null, null)
+                ->with(
+                    'brand',
+                    'color',
+                    'fuel',
+                    'cover',
+                    'gearBox'
+                )
+                ->where('user_id', auth()->user()->id)
+                ->where('status', 1)
+                ->paginate(env('APP_PAGINATE'));
+
+            $vehicles->transform(function ($vehicle) {
+                $vehicle->model_id = $vehicle->model();
+                $vehicle->version_id = $vehicle->version();
+                return $vehicle;
+            });
+
             if (!$vehicles) {
                 return $this->error('Veículos não encontrados');
             }
 
-            return $vehicles;                        
-  
+            return compact('vehicles');
         } catch (Exception $e) {
+            
             logger()->error('Log', [
-              'erro' => $e,
-              'exception' => $e->getMessage()
+                'erro' => $e,
+                'exception' => $e->getMessage()
             ]);
-            return $e;
+            
             return $this->internalError('Erro para listar registros, tente mais tarde');
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -96,23 +91,22 @@ class VehicleController extends Controller
     public function store(Request $request)
     {
         try {
-            
-            $response = $this->service->store($request);            
+
+            $response = $this->service->firstOrCreate($request);
             $photos = $response->photos ?? [];
-            
+
             if (!$response) {
-                return response()->json([400]);
+                $this->error('Erro para cadastrar veículo, tente mais tarde');
             }
 
             return array_merge(['vehicle' => $response, 'photos' => $photos], $this->getData());
-  
         } catch (Exception $e) {
             logger()->error('Log', [
-              'erro' => $e,
-              'exception' => $e->getMessage()
+                'erro' => $e,
+                'exception' => $e->getMessage()
             ]);
-                
-            return $this->internalError('Erro para cadastrar cadastrar, tente mais tarde');
+
+            return $this->internalError('Erro para cadastrar veículo, tente mais tarde');
         }
     }
 
@@ -124,19 +118,38 @@ class VehicleController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        try {
+            
+            $response = $this->service->findByUUID($id)->with(
+                'brand',
+                'color',
+                'fuel',
+                'cover',
+                'gearBox'
+            )->first();
+            
+            if (!$response) {
+                $this->error('Veículo não encontrado');
+            }
+            $response->model_id = $response->model();
+            $response->version_id = $response->version();
+            $brand = Brand::where('type_id', $response->type)->first();
+            $model = VehicleModel::where('type_id', $response->type)
+                                    ->where('brand_id', $response->brand_id)
+                                    ->first();
+            $version = Version::where([['brand_id', $response->brand_id], ['model_id', $response->model_id]])->first();
+            
+            return array_merge(['vehicle' => $response, 'photos' => $response->photos ?? []],[$brand, $model, $version, $this->getData()]);
+            
+        } catch (Exception $e) {
+            logger()->error('Log', [
+                'erro' => $e,
+                'exception' => $e->getMessage()
+            ]);
+                return $e->getMessage();
+            return $this->internalError('Erro encontrar veículo, tente mais tarde');
+        }
+    }    
 
     /**
      * Update the specified resource in storage.
@@ -148,36 +161,35 @@ class VehicleController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            
+
             $validator = Validator::make($request->all(), Vehicle::$rules);
 
-            if($validator->fails()) {
-                return response()->json(['error' => $validator->errors()] , 200);
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 200);
             }
-            
+
             $vehicle = $this->service->findByUUID($id);
-            
+
             if (!$vehicle) {
                 return $this->error('Veículo não encontrado');
             }
 
             $request['status'] = 1;
             $response = $this->service->update($request, $id);
-            
+
             if ($response) {
                 return $this->success('veículo cadastrado com sucesso');
             }
-            
-            return $this->error('Erro para cadastrar veículo');
 
+            return $this->error('Erro para cadastrar veículo');
         } catch (Exception $e) {
             logger()->error('Log', [
-              'erro' => $e,
-              'exception' => $e->getMessage()
+                'erro' => $e,
+                'exception' => $e->getMessage()
             ]);
-                
-          return $this->internalError($e->getMessage());
-        }          
+
+            return $this->internalError($e->getMessage());
+        }
     }
 
     /**
@@ -192,10 +204,10 @@ class VehicleController extends Controller
             return $this->service->destroy($id);
         } catch (Exception $e) {
             logger()->error('Log', [
-              'erro' => $e,
-              'exception' => $e->getMessage()
+                'erro' => $e,
+                'exception' => $e->getMessage()
             ]);
-                
+
             return $this->internalError('Erro para deletar, tente mais tarde');
         }
     }
@@ -221,7 +233,7 @@ class VehicleController extends Controller
             'colors' => Color::all(),
             'exchange' => Exchange::all(),
             'financial' => Financial::all(),
-            'cubiccms' => CubicCms::all()            
+            'cubiccms' => CubicCms::all()
         ];
     }
 
@@ -248,8 +260,8 @@ class VehicleController extends Controller
     public function model($typeId, $brandId)
     {
         $model = VehicleModel::where('type_id', $typeId)
-                                ->where('brand_id', $brandId)
-                                ->orderBy('name')->get();
+            ->where('brand_id', $brandId)
+            ->orderBy('name')->get();
         return compact('model');
     }
 

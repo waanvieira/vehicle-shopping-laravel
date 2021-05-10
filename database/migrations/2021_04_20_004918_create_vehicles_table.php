@@ -24,17 +24,17 @@ class CreateVehiclesTable extends Migration
             $table->string('uf', 2)->nullable();
             $table->string('uf_url', 2)->nullable();
             $table->integer('type')->nullable();
-            $table->integer('brand')->nullable();
-            $table->integer('model')->nullable();
-            $table->integer('version')->nullable();
-            $table->integer('regdate')->nullable();
-            $table->integer('gearbox')->nullable();
-            $table->integer('fuel')->nullable();
-            $table->integer('steering')->nullable();
-            $table->integer('motor_power')->nullable();
-            $table->integer('doors')->nullable();
-            $table->integer('color')->nullable();
-            $table->integer('cubic_cms')->nullable();
+            $table->integer('brand_id')->nullable();
+            $table->integer('model_id')->nullable();
+            $table->integer('version_id')->nullable();
+            $table->integer('regdate_id')->nullable();
+            $table->integer('gearbox_id')->nullable();
+            $table->integer('fuel_id')->nullable();
+            $table->integer('steering_id')->nullable();
+            $table->integer('motor_power_id')->nullable();
+            $table->integer('doors_id')->nullable();
+            $table->integer('color_id')->nullable();
+            $table->integer('cubic_cms_id')->nullable();
             $table->integer('owner')->nullable();
             $table->integer('mileage')->nullable();
             $table->json('features')->nullable();
@@ -45,7 +45,7 @@ class CreateVehiclesTable extends Migration
             $table->longText('description')->nullable();
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
-            $table->softDeletes();                            
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users');
         });
