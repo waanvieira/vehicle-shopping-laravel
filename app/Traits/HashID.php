@@ -16,7 +16,9 @@ trait HashID
         static::creating(function ($model) {
             $id = self::createHash($model);
             $model->id = $id;
-            $model->user_id = auth()->user() ? auth()->user()->id : null;
+            if (auth()->check()) {
+                $model->user_id = auth()->user() ? auth()->user()->id : null;
+            }            
         });
     }
 
