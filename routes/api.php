@@ -27,6 +27,7 @@ Route::group(["namespace" => "Api"], function () {
             Route::get('/{id}/brand', 'VehicleController@brand');
             Route::get('/{typeId}/{brandId}/model', 'VehicleController@model');
             Route::get('/{brandid}/{modelId}/version', 'VehicleController@version');            
+            Route::delete('/destroy/{uuid}', 'VehicleController@destroy');
             Route::resource('/photo', 'PhotoController')->only(['store', 'update', 'destroy']);
         });
     });    

@@ -50,6 +50,7 @@ class VehicleController extends Controller
             
             $vehicles = $this->service->getAll(true, null, null)
                 ->with(
+                    'cover',
                     'brand',
                     'color',
                     'fuel',
@@ -61,8 +62,8 @@ class VehicleController extends Controller
                 ->paginate(env('APP_PAGINATE'));
 
             $vehicles->transform(function ($vehicle) {
-                $vehicle->model_id = $vehicle->model();
-                $vehicle->version_id = $vehicle->version();
+                $vehicle->model = $vehicle->model();
+                $vehicle->version = $vehicle->version();
                 return $vehicle;
             });
 
@@ -77,7 +78,7 @@ class VehicleController extends Controller
                 'erro' => $e,
                 'exception' => $e->getMessage()
             ]);
-            
+            return $e->getMessage();
             return $this->internalError('Erro para listar registros, tente mais tarde');
         }
     }
@@ -120,8 +121,7 @@ class VehicleController extends Controller
     {
         try {
             
-            $response = $this->service->findByUUID($id)->with(
-                'brand',
+            $response = $this->service->findByUUID($id)->with(                
                 'color',
                 'fuel',
                 'cover',
@@ -131,15 +131,12 @@ class VehicleController extends Controller
             if (!$response) {
                 $this->error('Veículo não encontrado');
             }
-            $response->model_id = $response->model();
-            $response->version_id = $response->version();
-            $brand = Brand::where('type_id', $response->type)->first();
-            $model = VehicleModel::where('type_id', $response->type)
-                                    ->where('brand_id', $response->brand_id)
-                                    ->first();
-            $version = Version::where([['brand_id', $response->brand_id], ['model_id', $response->model_id]])->first();
             
-            return array_merge(['vehicle' => $response, 'photos' => $response->photos ?? []],[$brand, $model, $version, $this->getData()]);
+            $brands = $this->brand($response->type);
+            $model = $this->model($response->type, $response->brand_id);
+            $version = $this->version($response->brand_id, $response->model_id);            
+            
+            return array_merge(['vehicle' => $response, 'photos' => $response->photos ?? []], $brands, $model, $version, $this->getData());
             
         } catch (Exception $e) {
             logger()->error('Log', [
@@ -199,9 +196,16 @@ class VehicleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
+    {        
         try {
-            return $this->service->destroy($id);
+            $response = $this->service->destroy($id);
+
+            if ($response) {
+                return $this->success('Veículo deletado com sucesso');
+            }
+
+            return $this->error('Erro para deletar veículo');
+
         } catch (Exception $e) {
             logger()->error('Log', [
                 'erro' => $e,
