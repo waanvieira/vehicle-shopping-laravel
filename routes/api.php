@@ -30,5 +30,9 @@ Route::group(["namespace" => "Api"], function () {
             Route::delete('/destroy/{uuid}', 'VehicleController@destroy');
             Route::resource('/photo', 'PhotoController')->only(['store', 'update', 'destroy']);
         });
+
+        Route::group(['prefix' => 'notes'], function () {
+            Route::resource('', 'NoteController');
+        });
     });    
 });
