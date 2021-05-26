@@ -25,7 +25,7 @@ class UserServiceTest extends TestCase
     /**
      * A basic feature test example.
      *
-     * @group user
+     * @group service_user
      * @return void
      */
     public function testUserServiceStore()

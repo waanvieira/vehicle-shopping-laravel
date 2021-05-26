@@ -16,7 +16,8 @@ use App\Console\Commands\Database\{
     AddRegDates,
     AddTypes,
     addBrands,
-    addModels
+    addModels,
+    AddVersions
 };
 
 use Illuminate\Console\Command;
@@ -57,7 +58,8 @@ class RepairDBStucture extends Command
         AddRegDates::class,
         AddTypes::class,
         addBrands::class,
-        addModels::class
+        addModels::class,
+        AddVersions::class
     ];
 
     /**

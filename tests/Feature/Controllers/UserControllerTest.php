@@ -25,7 +25,7 @@ class UserControllerTest extends TestCase
     /**
      * A basic feature test example.
      *
-     * @group auth
+     * @group user
      * @return void
      */
     public function testUserControllerStore()

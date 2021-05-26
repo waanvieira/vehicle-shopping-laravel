@@ -34,22 +34,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(UserStore $request)
+    public function store(Request $request)
     {
         try {
             
@@ -79,6 +69,7 @@ class AuthController extends Controller
           return response()
                         ->json([
                           'result' => false,
+                          'error' => 'Falha na conexão',
                           'message'  => $e->getMessage(),
                           500
                         ]);
@@ -95,18 +86,7 @@ class AuthController extends Controller
     {
         //
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
+    
     /**
      * Update the specified resource in storage.
      *

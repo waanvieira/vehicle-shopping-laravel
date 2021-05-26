@@ -25,7 +25,7 @@ class AuthRegisterTest extends TestCase
     /**
      * A basic feature test example.
      *
-     * @group user
+     * @group auth
      * @return void
      */
     public function testAuthControllerStore()
