@@ -1,25 +1,27 @@
-version: "3.7"
+version: "3"
 services:
   app:
     build:
-      args:
-        user: sammy
-        uid: 1000
       context: ./
       dockerfile: Dockerfile
     image: vehicle
     container_name: vehicle-app
     restart: unless-stopped
+    ports:
+      - 5000:5000
     working_dir: /var/www/
     volumes:
       - ./:/var/www
+    tty: true
     networks:
-      - vehicle
+      - vehicle-net
 
   db:
     image: mysql:5.7
+    command: --innodb-use-native-aio=0
     container_name: vehicle-db
-    restart: unless-stopped
+    restart: always
+    tty: true
     ports:
       - 3306:3306
     environment:
@@ -30,16 +32,17 @@ services:
       SERVICE_TAGS: dev
       SERVICE_NAME: mysql  
     volumes:
-      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+      - ./mysql:/var/lib/mysql
+      - ./db.sql:/docker-entrypoint-initdb.d/setup.sql
     networks:
-      - vehicle
+      - vehicle-net
 
   adminer:
     image: adminer
     ports:
       - 8080:8080
     networks:
-      - vehicle
+      - vehicle-net
 
   nginx:
     image: nginx:alpine
@@ -51,8 +54,11 @@ services:
       - ./:/var/www
       - ./docker-compose/nginx:/etc/nginx/conf.d/
     networks:
-      - vehicle
+      - vehicle-net
 
 networks:
-  vehicle:
+  vehicle-net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.1.0/24
